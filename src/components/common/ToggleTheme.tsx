@@ -13,8 +13,7 @@ export default component$(() => {
     <label class="swap swap-rotate">
       <input
         checked={store.theme == "dark"}
-        onChange$={(e) => {
-          console.log(e);
+        onChange$={() => {
           switch (store.theme) {
             case "dark":
               document.documentElement.setAttribute("data-theme", "light");

@@ -39,8 +39,6 @@ export default component$(() => {
   const submitError = useSignal("");
 
   const onSubmit = $(async () => {
-    console.log("submit");
-
     if (inputText.value.trim().length === 0) {
       inputError.value = "Поле не может быть пустым";
       return;
