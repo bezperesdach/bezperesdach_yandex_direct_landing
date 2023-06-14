@@ -1,4 +1,4 @@
-export const YANDEX_METRIKA_ID = Number(process.env.PUBLIC_YANDEX_METRIKA_ID);
+export const YANDEX_METRIKA_ID = import.meta.env.PUBLIC_YANDEX_METRIKA_ID;
 import { isDevelopment } from "@/utils/utils";
 
 export const ym = (goal: string, goalName: string) => {
