@@ -6,12 +6,12 @@ import { server$, type DocumentHead } from "@builder.io/qwik-city";
 
 export const serverFunction = server$(async function (email: string) {
   const API_URL = isDevelopment ? "http://127.0.0.1:1337/api" : this.env.get("BACKEND_API_URL");
-
   try {
     const response = await fetch(`${API_URL}/order/direct-submission`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(this.headers.get("X-Forwarded-For") && { "X-Forwarded-For": this.headers.get("X-Forwarded-For")! }),
       },
       body: JSON.stringify({
         email,
@@ -51,7 +51,6 @@ export default component$(() => {
     }
 
     submitLoading.value = true;
-
     const response = await serverFunction(inputText.value);
     if (response) {
       createConfetti();
