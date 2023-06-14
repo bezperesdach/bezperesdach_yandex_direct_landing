@@ -28,10 +28,6 @@ export const RouterHead = component$(() => {
       <meta name="msapplication-TileColor" content="#2d89ef" />
 
       <meta name="msapplication-config" content="/favicon/browserconfig.xml?v=1" />
-      <meta name="theme-color" content="#ffffff" />
-
-      <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-      <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)" />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta property="twitter:domain" content="bezperesdach.online" />
