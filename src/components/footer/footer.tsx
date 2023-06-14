@@ -10,8 +10,14 @@ export default component$(() => {
         </p>
 
         <p class="text-xs tracking-widest text-opacity-80 text-base-content mt-4">
-          Используя сервис “Безпересдач”, вы принимаете <Link class="link">пользовательское соглашение</Link>, а также{" "}
-          <Link class="link">политику обработки персональных данных</Link>
+          Используя сервис “Безпересдач”, вы принимаете{" "}
+          <Link href="/agreement" class="link">
+            пользовательское соглашение
+          </Link>
+          , а также{" "}
+          <Link href="/processing-policy.pdf" class="link">
+            политику обработки персональных данных
+          </Link>
         </p>
         <p class="text-xs tracking-widest text-opacity-80 text-base-content mt-4">©2022-{new Date().getFullYear()} Безпересдач </p>
       </div>
