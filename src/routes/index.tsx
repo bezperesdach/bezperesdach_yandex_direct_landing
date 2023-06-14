@@ -1,5 +1,6 @@
 import createConfetti from "@/utils/confetti";
 import { isDevelopment } from "@/utils/utils";
+import { ym } from "@/utils/yandex-metrica";
 
 import { component$, $, useSignal, useTask$ } from "@builder.io/qwik";
 import { server$, type DocumentHead } from "@builder.io/qwik-city";
@@ -53,6 +54,7 @@ export default component$(() => {
     submitLoading.value = true;
     const response = await serverFunction(inputText.value);
     if (response) {
+      ym("reachGoal", "orderSuccess");
       createConfetti();
       submitSuccess.value = true;
       submitLoading.value = false;
@@ -131,6 +133,7 @@ export default component$(() => {
                 autoComplete="off"
                 spellcheck={false}
                 disabled={submitLoading.value}
+                onFocus$={() => (submitError.value = "")}
               />
 
               <label class="label">
