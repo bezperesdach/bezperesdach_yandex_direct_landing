@@ -2,8 +2,31 @@ import createConfetti from "@/utils/confetti";
 import { isDevelopment } from "@/utils/utils";
 import { ym } from "@/utils/yandex-metrica";
 
-import { component$, $, useSignal, useTask$, useVisibleTask$ } from "@builder.io/qwik";
-import { server$, type DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { component$, $, useSignal, useTask$ } from "@builder.io/qwik";
+import { server$, type DocumentHead } from "@builder.io/qwik-city";
+
+import type { RequestHandler } from "@builder.io/qwik-city";
+
+export const onRequest: RequestHandler = async ({ redirect, url }) => {
+  const utmContent = url.searchParams.get("utm_content");
+  console.log(utmContent);
+  if (utmContent) {
+    if (utmContent !== "{ad_id}") {
+      const redirectUrl = new URL("https://bezperesdach.ru");
+      redirectUrl.searchParams.set("utm_source", "yandex");
+      redirectUrl.searchParams.set("utm_medium", "cpc");
+      const yclid = url.searchParams.get("yclid");
+      if (yclid) {
+        redirectUrl.searchParams.set("yclid", yclid);
+      }
+      throw redirect(302, redirectUrl.toString());
+    } else {
+      // empty
+    }
+  } else {
+    // empty
+  }
+};
 
 export const serverFunction = server$(async function (email: string) {
   const API_URL = isDevelopment ? "http://127.0.0.1:1337/api" : this.env.get("BACKEND_API_URL");
@@ -31,33 +54,13 @@ export const serverFunction = server$(async function (email: string) {
 });
 
 export default component$(() => {
-  const location = useLocation();
+  // const location = useLocation();
   const submitLoading = useSignal(false);
   const submitSuccess = useSignal(false);
 
   const inputText = useSignal("");
   const inputError = useSignal("");
   const submitError = useSignal("");
-
-  useVisibleTask$(() => {
-    const utmContent = location.url.searchParams.get("utm_content");
-    if (utmContent) {
-      if (utmContent !== "{ad_id}") {
-        const redirect = new URL("https://bezperesdach.ru");
-        redirect.searchParams.set("utm_source", "yandex");
-        redirect.searchParams.set("utm_medium", "cpc");
-        const yclid = location.url.searchParams.get("yclid");
-        if (yclid) {
-          redirect.searchParams.set("yclid", yclid);
-        }
-        window.location.replace(redirect.toString());
-      } else {
-        // empty
-      }
-    } else {
-      // empty
-    }
-  });
 
   const onSubmit = $(async () => {
     if (inputText.value.trim().length === 0) {
