@@ -5,6 +5,29 @@ import { ym } from "@/utils/yandex-metrica";
 import { component$, $, useSignal, useTask$ } from "@builder.io/qwik";
 import { server$, type DocumentHead, useLocation } from "@builder.io/qwik-city";
 
+import type { RequestHandler } from "@builder.io/qwik-city";
+
+export const onRequest: RequestHandler = async ({ redirect, url }) => {
+  const utmContent = url.searchParams.get("utm_content");
+
+  if (utmContent) {
+    if (utmContent !== "{ad_id}") {
+      const redirectUrl = new URL("https://bezperesdach.ru");
+      redirectUrl.searchParams.set("utm_source", "yandex");
+      redirectUrl.searchParams.set("utm_medium", "cpc");
+      const yclid = url.searchParams.get("yclid");
+      if (yclid) {
+        redirectUrl.searchParams.set("yclid", yclid);
+      }
+      throw redirect(302, redirectUrl.toString());
+    } else {
+      // empty
+    }
+  } else {
+    // empty
+  }
+};
+
 export const serverFunction = server$(async function (email: string) {
   const API_URL = isDevelopment ? "http://127.0.0.1:1337/api" : this.env.get("BACKEND_API_URL");
   try {
