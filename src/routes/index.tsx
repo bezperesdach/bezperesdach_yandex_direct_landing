@@ -5,31 +5,35 @@ import { ym } from "@/utils/yandex-metrica";
 import { component$, $, useSignal, useTask$ } from "@builder.io/qwik";
 import { server$, type DocumentHead, useLocation } from "@builder.io/qwik-city";
 
-import type { RequestHandler } from "@builder.io/qwik-city";
+// import type { RequestHandler } from "@builder.io/qwik-city";
 
-export const onRequest: RequestHandler = async ({ redirect, url }) => {
-  const utmContent = url.searchParams.get("utm_content");
-  const compaigns_ids = ["89803209"];
+// export const onRequest: RequestHandler = async ({ redirect, url }) => {
+//   const utmContent = url.searchParams.get("utm_content");
+//   const compaigns_ids = ["89803209"];
 
-  if (utmContent) {
-    if (compaigns_ids.includes(utmContent)) {
-      const redirectUrl = new URL("https://bezperesdach.ru");
-      redirectUrl.searchParams.set("utm_source", "yandex");
-      redirectUrl.searchParams.set("utm_medium", "cpc");
-      const yclid = url.searchParams.get("yclid");
-      if (yclid) {
-        redirectUrl.searchParams.set("yclid", yclid);
-      }
-      throw redirect(302, redirectUrl.toString());
-    } else {
-      // empty
-    }
-  } else {
-    // empty
-  }
+//   if (utmContent) {
+//     if (compaigns_ids.includes(utmContent)) {
+//       const redirectUrl = new URL("https://bezperesdach.ru");
+//       redirectUrl.searchParams.set("utm_source", "yandex");
+//       redirectUrl.searchParams.set("utm_medium", "cpc");
+//       const yclid = url.searchParams.get("yclid");
+//       if (yclid) {
+//         redirectUrl.searchParams.set("yclid", yclid);
+//       }
+//       throw redirect(302, redirectUrl.toString());
+//     } else {
+//       // empty
+//     }
+//   } else {
+//     // empty
+//   }
+// };
+
+type Params = {
+  yclid: string;
 };
 
-export const serverFunction = server$(async function (email: string) {
+export const serverFunction = server$(async function (email: string, params?: Params) {
   const API_URL = isDevelopment ? "http://127.0.0.1:1337/api" : this.env.get("BACKEND_API_URL");
   try {
     const response = await fetch(`${API_URL}/order/direct-submission`, {
@@ -41,6 +45,7 @@ export const serverFunction = server$(async function (email: string) {
       body: JSON.stringify({
         email,
         secret: this.env.get("SERVER_PRIVATE_KEY"),
+        params,
       }),
     });
 
@@ -75,22 +80,28 @@ export default component$(() => {
     }
 
     submitLoading.value = true;
-    const response = await serverFunction(inputText.value);
+
+    const redirectUrl = new URL("https://bezperesdach.ru");
+    redirectUrl.searchParams.set("utm_source", "yandex");
+    redirectUrl.searchParams.set("utm_medium", "cpc");
+    const yclid = location.url.searchParams.get("yclid");
+    if (yclid) {
+      redirectUrl.searchParams.set("yclid", yclid);
+    }
+
+    const response = await serverFunction(inputText.value, yclid ? { yclid: yclid } : undefined);
+
     if (response) {
       ym("reachGoal", "orderSuccess");
       createConfetti();
       submitSuccess.value = true;
       submitLoading.value = false;
+      await new Promise((r) => setTimeout(r, 1000));
 
-      const redirectUrl = new URL("https://bezperesdach.ru");
-      redirectUrl.searchParams.set("utm_source", "yandex");
-      redirectUrl.searchParams.set("utm_medium", "cpc");
-      const yclid = location.url.searchParams.get("yclid");
-      if (yclid) {
-        redirectUrl.searchParams.set("yclid", yclid);
-      }
       window.location.href = redirectUrl.toString();
     } else {
+      window.location.href = redirectUrl.toString();
+      await new Promise((r) => setTimeout(r, 3000));
       submitLoading.value = false;
       submitError.value = "Не удалось отправить сообщение на почту";
     }
