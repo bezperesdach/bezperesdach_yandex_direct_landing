@@ -9,9 +9,10 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 
 export const onRequest: RequestHandler = async ({ redirect, url }) => {
   const utmContent = url.searchParams.get("utm_content");
+  const compaigns_ids = ["89803209"];
 
   if (utmContent) {
-    if (utmContent !== "{ad_id}") {
+    if (utmContent !== "{ad_id}" && compaigns_ids.includes(utmContent)) {
       const redirectUrl = new URL("https://bezperesdach.ru");
       redirectUrl.searchParams.set("utm_source", "yandex");
       redirectUrl.searchParams.set("utm_medium", "cpc");
